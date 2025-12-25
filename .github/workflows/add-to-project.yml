@@ -1,37 +1,41 @@
-name: Auto Add PR to Project
+name: Auto Add & Move Merged PR (Supports Fork)
 
 on:
-  pull_request:
-    types: [opened]
+  pull_request_target: # 포크된 PR에서도 시크릿을 사용하기 위해 변경
+    types: [opened, closed]
+    branches:
+      - 'main'
+      - 'develop*' # develop으로 시작하는 모든 브랜치 타겟
 
 jobs:
-  add-to-project:
+  project-automation:
     runs-on: ubuntu-latest
     steps:
-      - name: Add PR to Project
-        id: add_pr  
+      # 1. PR이 생성되었을 때 (Opened)
+      - name: Add PR to Project (Opened)
+        if: github.event.action == 'opened'
+        id: add_pr
         uses: actions/add-to-project@v1.0.1
         with:
-          # Project URL
           project-url: https://github.com/orgs/jiwon-tech-innovation/projects/1
-          # 받은 Token
           github-token: ${{ secrets.PROJECT_TOKEN }}
 
-      - name: Set Status to PR
+      # 2. PR이 머지되었을 때 (Closed & Merged)
+      - name: Move to Done (Merged)
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
         run: |
-          # 1. 프로젝트의 고유 Global ID 가져오기
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          
+          # 프로젝트 및 필드 ID 가져오기
           PROJECT_ID=$(gh project view 1 --owner "jiwon-tech-innovation" --format json --jq '.id')
-          
-          # 2. 'Status' 필드의 ID 가져오기
           FIELD_ID=$(gh project field-list 1 --owner "jiwon-tech-innovation" --format json --jq '.fields[] | select(.name=="Status") | .id')
+          OPTION_ID=$(gh project field-list 1 --owner "jiwon-tech-innovation" --format json --jq ".fields[] | select(.name==\"Status\") | .options[] | select(.name==\"Done\") | .id")
           
-          # 3. 'PR' 옵션의 고유 ID 가져오기 
-          OPTION_ID=$(gh project field-list 1 --owner "jiwon-tech-innovation" --format json --jq ".fields[] | select(.name==\"Status\") | .options[] | select(.name==\"PR\") | .id")
+          # 아이템 ID 찾기 후 Done으로 변경
+          ITEM_ID=$(gh project item-list 1 --owner "jiwon-tech-innovation" --format json --jq ".items[] | select(.content.url==\"$PR_URL\") | .id")
           
-          # 4. 아이템의 상태를 'PR'로 업데이트
-          gh project item-edit --id ${{ steps.add_pr.outputs.itemId }} \
-            --project-id "$PROJECT_ID" \
-            --field-id "$FIELD_ID" \
-            --single-select-option-id "$OPTION_ID"
+          if [ -n "$ITEM_ID" ]; then
+            gh project item-edit --id "$ITEM_ID" --project-id "$PROJECT_ID" --field-id "$FIELD_ID" --single-select-option-id "$OPTION_ID"
+          fi
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
