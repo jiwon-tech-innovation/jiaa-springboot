@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package jiaa;
+
+option go_package = "jiaa-server-core/pkg/proto";
+
+// IntelligenceService Dev 5(Intelligence Worker)와 통신하기 위한 서비스
+// 무거운 AI 연산 수행: STT, URL 분류, Auto-RAG
+service IntelligenceService {
+  // 에러 로그 분석 (Emergency Protocol)
+  rpc AnalyzeLog (LogAnalysisRequest) returns (LogAnalysisResponse);
+  
+  // URL/Title 분류 (Study vs Play)
+  rpc ClassifyURL (URLClassifyRequest) returns (URLClassifyResponse);
+  
+  // 실시간 STT (스트리밍)
+  rpc TranscribeAudio (stream AudioChunk) returns (TranscribeResponse);
+}
+
+message LogAnalysisRequest {
+  string client_id = 1;
+  string error_log = 2;     // 에러 로그 텍스트
+  string scream_text = 3;   // 비명 텍스트 (STT 결과)
+  string context = 4;       // 추가 컨텍스트 (선택)
+}
+
+message LogAnalysisResponse {
+  bool success = 1;
+  string markdown = 2;      // AI 분석 결과 (Markdown)
+  string solution_code = 3; // 해결 코드 (선택)
+  string error_type = 4;    // 에러 유형 분류
+  float confidence = 5;     // 신뢰도 (0.0-1.0)
+}
+
+message URLClassifyRequest {
+  string client_id = 1;
+  string url = 2;
+  string title = 3;
+  string page_content = 4;  // 페이지 내용 (선택)
+}
+
+message URLClassifyResponse {
+  bool success = 1;
+  URLClassification classification = 2;
+  float confidence = 3;     // 신뢰도 (0.0-1.0)
+  string reason = 4;        // 분류 이유
+}
+
+enum URLClassification {
+  URL_UNKNOWN = 0;
+  STUDY = 1;                // 공부 관련
+  PLAY = 2;                 // 놀이/오락 관련
+  NEUTRAL = 3;              // 중립
+  WORK = 4;                 // 업무 관련
+}
+
+message AudioChunk {
+  string client_id = 1;
+  bytes audio_data = 2;     // PCM 오디오 데이터
+  int32 sample_rate = 3;    // 샘플 레이트 (예: 16000)
+  bool is_final = 4;        // 마지막 청크 여부
+}
+
+message TranscribeResponse {
+  bool success = 1;
+  string text = 2;          // 변환된 텍스트
+  bool is_final = 3;        // 최종 결과 여부
+  float audio_level = 4;    // 오디오 레벨 (dB)
+}

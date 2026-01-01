@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package jiaa;
+
+option go_package = "jiaa-server-core/pkg/proto";
+
+// PhysicalControlService Dev 1(OS Agent)과 통신하기 위한 서비스
+// 마우스 감도 저하, 창 흔들기 등 물리적 제어 실행
+service PhysicalControlService {
+  // 사보타주 명령 실행
+  rpc ExecuteCommand (PhysicalCommandRequest) returns (PhysicalCommandResponse);
+  
+  // 영점 조절 (Calibration Reset)
+  rpc SetZero (SetZeroRequest) returns (SetZeroResponse);
+}
+
+message PhysicalCommandRequest {
+  string client_id = 1;
+  PhysicalActionType action_type = 2;
+  int32 intensity = 3;  // 1-10
+  string message = 4;
+  map<string, string> params = 5;  // 추가 파라미터
+}
+
+enum PhysicalActionType {
+  PHYSICAL_ACTION_UNKNOWN = 0;
+  MOUSE_SENSITIVITY_DOWN = 1;     // 마우스 감도 저하
+  WINDOW_SHAKE = 2;               // 창 흔들기
+  KEYBOARD_DELAY = 3;             // 키보드 딜레이
+  MINIMIZE_ALL = 4;               // 모든 창 최소화
+  CLOSE_APP = 5;                  // 앱 종료
+  MOUSE_LOCK = 6;                 // 마우스 잠금
+}
+
+message PhysicalCommandResponse {
+  bool success = 1;
+  string error_code = 2;
+  string message = 3;
+}
+
+message SetZeroRequest {
+  string client_id = 1;
+}
+
+message SetZeroResponse {
+  bool success = 1;
+}

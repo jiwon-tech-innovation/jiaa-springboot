@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package jiaa;
+
+option go_package = "jiaa-server-core/pkg/proto";
+
+service SabotageCommandService {
+  rpc ExecuteSabotage (SabotageRequest) returns (SabotageResponse);
+}
+
+message SabotageRequest {
+  string client_id = 1;
+  string action_type = 2;
+  int32 intensity = 3;
+  string message = 4;
+}
+
+message SabotageResponse {
+  bool success = 1;
+  string error_code = 2;
+}

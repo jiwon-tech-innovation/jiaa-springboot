@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package jiaa;
+
+option go_package = "jiaa-server-core/pkg/proto";
+
+// ScoringService Dev 6(Data & Fact Service)와 통신하기 위한 서비스
+// 실시간 점수 산출, 상태 결정, 팩트 폭격
+service ScoringService {
+  // 실시간 점수 스트림 (Dev 3에게 0.1초마다 전송)
+  rpc StreamScore (ScoreStreamRequest) returns (stream ScorePacket);
+  
+  // 팩트 폭격 요청
+  rpc GetFactBomb (FactBombRequest) returns (FactBombResponse);
+  
+  // 게이미피케이션 정보 조회
+  rpc GetGamificationInfo (GamificationRequest) returns (GamificationResponse);
+}
+
+message ScoreStreamRequest {
+  string client_id = 1;
+}
+
+message ScorePacket {
+  string client_id = 1;
+  int32 current_score = 2;    // 0-100
+  ScoreState state = 3;
+  int64 timestamp = 4;        // Unix milliseconds
+  ScoreBreakdown breakdown = 5;  // 점수 상세 내역
+}
+
+enum ScoreState {
+  SCORE_STATE_UNKNOWN = 0;
+  THINKING = 1;               // Score > 80 - 건드리지 마
+  FOCUSED = 2;                // 50 < Score <= 80 - 집중 중
+  DISTRACTED = 3;             // 30 < Score <= 50 - 분산됨
+  SLEEPING = 4;               // Score <= 30 - 잠듦 (깨워야 함)
+  EMERGENCY = 5;              // Audio > 90dB - 응급 상황
+}
+
+// 5가지 센서 데이터 가중치 합산 내역
+message ScoreBreakdown {
+  int32 head_pose_score = 1;  // 머리 자세 점수
+  int32 eye_focus_score = 2;  // 눈 집중도 점수
+  int32 audio_score = 3;      // 오디오 점수
+  int32 activity_score = 4;   // 활동 점수 (URL/App)
+  int32 idle_score = 5;       // 유휴 시간 점수
+}
+
+message FactBombRequest {
+  string client_id = 1;
+  string trigger_event = 2;   // 트리거 이벤트 (예: "youtube_detected")
+  string target_url = 3;      // 대상 URL (선택)
+}
+
+message FactBombResponse {
+  bool success = 1;
+  string fact_message = 2;    // 팩트 폭격 멘트
+  int64 accumulated_seconds = 3;  // 누적 시간 (초)
+  string time_period = 4;     // 기간 (예: "지난주")
+}
+
+message GamificationRequest {
+  string client_id = 1;
+}
+
+message GamificationResponse {
+  bool success = 1;
+  int32 level = 2;            // 현재 레벨
+  int64 experience = 3;       // 현재 경험치
+  int64 next_level_exp = 4;   // 다음 레벨 경험치
+  int64 total_study_seconds = 5;  // 총 공부 시간 (초)
+  float average_score = 6;    // 평균 점수
+  repeated Achievement achievements = 7;  // 업적 목록
+}
+
+message Achievement {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool unlocked = 4;
+  int64 unlocked_at = 5;      // 해금 시간 (Unix timestamp)
+}

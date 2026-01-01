@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package jiaa;
+
+option go_package = "jiaa-server-core/pkg/proto";
+
+// ScreenControlService Dev 3(Interaction Client)와 통신하기 위한 서비스
+// 화면 연출, 시각적 제어, AI 결과 전달
+service ScreenControlService {
+  // 시각적 사보타주 명령 실행 (Glitch, 붉은 점멸 등)
+  rpc ExecuteVisualCommand (VisualCommandRequest) returns (VisualCommandResponse);
+  
+  // AI 결과(Markdown) 표시
+  rpc DisplayAIResult (AIResultRequest) returns (AIResultResponse);
+  
+  // TTS 재생
+  rpc PlayTTS (TTSRequest) returns (TTSResponse);
+  
+  // 점수 게이지 업데이트
+  rpc UpdateScoreGauge (ScoreUpdateRequest) returns (ScoreUpdateResponse);
+  
+  // 오버레이 표시
+  rpc ShowOverlay (OverlayRequest) returns (OverlayResponse);
+}
+
+message VisualCommandRequest {
+  string client_id = 1;
+  VisualEffectType effect_type = 2;
+  int32 intensity = 3;  // 1-10
+  int32 duration_ms = 4;  // 지속 시간 (밀리초)
+  string message = 5;
+}
+
+enum VisualEffectType {
+  VISUAL_EFFECT_UNKNOWN = 0;
+  SCREEN_GLITCH = 1;        // 화면 노이즈/글리치
+  RED_FLASH = 2;            // 붉은 점멸
+  SCREEN_SHAKE = 3;         // 화면 흔들림
+  BLUR_OVERLAY = 4;         // 블러 오버레이
+  BLACK_SCREEN = 5;         // 화면 끔
+  VIGNETTE = 6;             // 비네팅 효과
+}
+
+message VisualCommandResponse {
+  bool success = 1;
+  string error_code = 2;
+}
+
+message AIResultRequest {
+  string client_id = 1;
+  string markdown = 2;      // RAG 결과 마크다운
+  string title = 3;         // 제목 (선택)
+  AIResultType result_type = 4;
+}
+
+enum AIResultType {
+  AI_RESULT_UNKNOWN = 0;
+  ERROR_SOLUTION = 1;       // 에러 해결 코드
+  TIL_CONTENT = 2;          // TIL 콘텐츠
+  FACT_BOMB = 3;            // 팩트 폭격
+  STUDY_TIP = 4;            // 공부 팁
+}
+
+message AIResultResponse {
+  bool success = 1;
+  string error_code = 2;
+}
+
+message TTSRequest {
+  string client_id = 1;
+  string text = 2;
+  string voice = 3;         // 음성 종류 (선택)
+  float speed = 4;          // 재생 속도 (기본 1.0)
+}
+
+message TTSResponse {
+  bool success = 1;
+  string error_code = 2;
+}
+
+message ScoreUpdateRequest {
+  string client_id = 1;
+  int32 current_score = 2;  // 0-100
+  string state = 3;         // THINKING, SLEEPING, etc.
+}
+
+message ScoreUpdateResponse {
+  bool success = 1;
+}
+
+message OverlayRequest {
+  string client_id = 1;
+  string title = 2;
+  string message = 3;
+  OverlayType overlay_type = 4;
+  int32 duration_ms = 5;    // 표시 시간 (0 = 수동 닫기)
+}
+
+enum OverlayType {
+  OVERLAY_UNKNOWN = 0;
+  WARNING = 1;              // 경고 창
+  ERROR = 2;                // 에러 창
+  INFO = 3;                 // 정보 창
+  SUCCESS = 4;              // 성공 창
+}
+
+message OverlayResponse {
+  bool success = 1;
+  string error_code = 2;
+}
