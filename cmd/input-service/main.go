@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	// Adapters - In
+	grpcIn "jiaa-server-core/internal/input/adapter/in/grpc"
 	httpAdapter "jiaa-server-core/internal/input/adapter/in/http"
 	kafkaIn "jiaa-server-core/internal/input/adapter/in/kafka"
 
@@ -121,13 +122,20 @@ func main() {
 		return c.JSON(200, map[string]string{"status": "ok"})
 	})
 
-	// 6. Start Server
+	// 6. Start Servers
+	// HTTP Server
 	go func() {
 		log.Printf("[MAIN] Starting HTTP server on port %s", config.HTTPPort)
 		if err := e.Start(":" + config.HTTPPort); err != nil {
 			log.Printf("[MAIN] HTTP server stopped: %v", err)
 		}
 	}()
+
+	// gRPC Server (Vision Service Input) on Port 50052
+	inputGrpcServer := grpcIn.NewInputGrpcServer("50052", reflexService)
+	if err := inputGrpcServer.Start(); err != nil {
+		log.Printf("[MAIN] Failed to start Input gRPC server: %v", err)
+	}
 
 	// 7. Graceful Shutdown
 	quit := make(chan os.Signal, 1)
@@ -137,6 +145,7 @@ func main() {
 	log.Printf("[MAIN] Shutting down...")
 
 	// Cleanup
+	inputGrpcServer.Stop()
 	if stateConsumer != nil {
 		stateConsumer.Stop()
 	}
