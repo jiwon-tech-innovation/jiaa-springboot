@@ -11,6 +11,7 @@ const (
 	ActivityAppClose  ActivityType = "APP_CLOSE"
 	ActivityIdleStart ActivityType = "IDLE_START"
 	ActivityIdleEnd   ActivityType = "IDLE_END"
+	ActivityInputUsage ActivityType = "INPUT_USAGE"
 )
 
 // ClientActivity 클라이언트의 활동 데이터를 나타내는 도메인 엔티티

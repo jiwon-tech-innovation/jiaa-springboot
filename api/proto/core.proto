@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package jiaa.core;
+
+option java_multiple_files = true;
+option java_package = "com.jiaa.common.core";
+option go_package = "jiaa-server-core/pkg/proto";
+
+service CoreService {
+  // 1. 클라이언트(OS/Vision) 연결: 센서 정보 주고 <-> 명령 받고 (양방향)
+  rpc SyncClient(stream ClientHeartbeat) returns (stream ServerCommand);
+
+  // 2. AI 분석 결과 보고 (윤성 -> 승민)
+  rpc ReportAnalysisResult(AnalysisReport) returns (Ack);
+}
+
+// --- 클라이언트 -> 서버 (1초마다 전송) ---
+message ClientHeartbeat {
+  string client_id = 1;       // "pc-01", "cam-01"
+  
+  // OS 활동 통계 (Dev 1용)
+  int32 mouse_distance = 2;   // 1초간 이동 거리 합
+  int32 click_count = 3;      // 1초간 클릭 수
+  int32 keystroke_count = 4;  // 1초간 키 입력 수
+  bool is_os_idle = 5;        // OS 유휴 상태 여부
+
+  // 비전 데이터 (Dev 2용)
+  bool is_eyes_closed = 6;    // 눈 감음 여부
+  float concentration_score = 7; // 비전 모델이 판단한 집중도
+}
+
+// --- 서버 -> 클라이언트 (명령) ---
+message ServerCommand {
+  enum CommandType {
+    NONE = 0;
+    SHAKE_MOUSE = 1;    // 졸음 깨우기 (물리)
+    BLOCK_SCREEN = 2;   // 화면 가리기 (딴짓)
+    SHOW_MESSAGE = 3;   // 경고 메시지/RAG 결과 띄우기
+    PLAY_SOUND = 4;     // TTS 읽기
+  }
+  CommandType type = 1;
+  string payload = 2;   // 메시지 내용이나 추가 정보
+}
+
+// --- AI 결과 보고 ---
+message AnalysisReport {
+  string type = 1;      // "EMERGENCY", "URL_BLOCK"
+  string content = 2;   // 상세 내용
+}
+
+message Ack {
+  bool success = 1;
+}

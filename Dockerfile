@@ -30,5 +30,6 @@ COPY --from=builder /server .
 
 # Expose HTTP Port
 EXPOSE 8080
+EXPOSE 50052
 
 CMD ["./server"]
