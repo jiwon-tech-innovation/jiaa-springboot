@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.31.1
-// source: api/proto/core.proto
+// source: core.proto
 
 package proto
 
@@ -60,11 +60,11 @@ func (x ServerCommand_CommandType) String() string {
 }
 
 func (ServerCommand_CommandType) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_core_proto_enumTypes[0].Descriptor()
+	return file_core_proto_enumTypes[0].Descriptor()
 }
 
 func (ServerCommand_CommandType) Type() protoreflect.EnumType {
-	return &file_api_proto_core_proto_enumTypes[0]
+	return &file_core_proto_enumTypes[0]
 }
 
 func (x ServerCommand_CommandType) Number() protoreflect.EnumNumber {
@@ -73,7 +73,7 @@ func (x ServerCommand_CommandType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServerCommand_CommandType.Descriptor instead.
 func (ServerCommand_CommandType) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_core_proto_rawDescGZIP(), []int{1, 0}
+	return file_core_proto_rawDescGZIP(), []int{1, 0}
 }
 
 // --- 클라이언트 -> 서버 (1초마다 전송) ---
@@ -88,13 +88,17 @@ type ClientHeartbeat struct {
 	// 비전 데이터 (Dev 2용)
 	IsEyesClosed       bool    `protobuf:"varint,6,opt,name=is_eyes_closed,json=isEyesClosed,proto3" json:"is_eyes_closed,omitempty"`                  // 눈 감음 여부
 	ConcentrationScore float32 `protobuf:"fixed32,7,opt,name=concentration_score,json=concentrationScore,proto3" json:"concentration_score,omitempty"` // 비전 모델이 판단한 집중도
+	KeyboardEntropy    float32 `protobuf:"fixed32,8,opt,name=keyboard_entropy,json=keyboardEntropy,proto3" json:"keyboard_entropy,omitempty"`          // 키보드 엔트로피 (0.0 ~ 5.0)
+	ActiveWindowTitle  string  `protobuf:"bytes,9,opt,name=active_window_title,json=activeWindowTitle,proto3" json:"active_window_title,omitempty"`    // 활성 창 제목
+	IsDragging         bool    `protobuf:"varint,10,opt,name=is_dragging,json=isDragging,proto3" json:"is_dragging,omitempty"`                         // 마우스 드래그 여부
+	AvgDwellTime       float64 `protobuf:"fixed64,11,opt,name=avg_dwell_time,json=avgDwellTime,proto3" json:"avg_dwell_time,omitempty"`                // 평균 키 누름 시간 (ms)
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ClientHeartbeat) Reset() {
 	*x = ClientHeartbeat{}
-	mi := &file_api_proto_core_proto_msgTypes[0]
+	mi := &file_core_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -106,7 +110,7 @@ func (x *ClientHeartbeat) String() string {
 func (*ClientHeartbeat) ProtoMessage() {}
 
 func (x *ClientHeartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_core_proto_msgTypes[0]
+	mi := &file_core_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -119,7 +123,7 @@ func (x *ClientHeartbeat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientHeartbeat.ProtoReflect.Descriptor instead.
 func (*ClientHeartbeat) Descriptor() ([]byte, []int) {
-	return file_api_proto_core_proto_rawDescGZIP(), []int{0}
+	return file_core_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ClientHeartbeat) GetClientId() string {
@@ -171,6 +175,34 @@ func (x *ClientHeartbeat) GetConcentrationScore() float32 {
 	return 0
 }
 
+func (x *ClientHeartbeat) GetKeyboardEntropy() float32 {
+	if x != nil {
+		return x.KeyboardEntropy
+	}
+	return 0
+}
+
+func (x *ClientHeartbeat) GetActiveWindowTitle() string {
+	if x != nil {
+		return x.ActiveWindowTitle
+	}
+	return ""
+}
+
+func (x *ClientHeartbeat) GetIsDragging() bool {
+	if x != nil {
+		return x.IsDragging
+	}
+	return false
+}
+
+func (x *ClientHeartbeat) GetAvgDwellTime() float64 {
+	if x != nil {
+		return x.AvgDwellTime
+	}
+	return 0
+}
+
 // --- 서버 -> 클라이언트 (명령) ---
 type ServerCommand struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
@@ -182,7 +214,7 @@ type ServerCommand struct {
 
 func (x *ServerCommand) Reset() {
 	*x = ServerCommand{}
-	mi := &file_api_proto_core_proto_msgTypes[1]
+	mi := &file_core_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -194,7 +226,7 @@ func (x *ServerCommand) String() string {
 func (*ServerCommand) ProtoMessage() {}
 
 func (x *ServerCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_core_proto_msgTypes[1]
+	mi := &file_core_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -207,7 +239,7 @@ func (x *ServerCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCommand.ProtoReflect.Descriptor instead.
 func (*ServerCommand) Descriptor() ([]byte, []int) {
-	return file_api_proto_core_proto_rawDescGZIP(), []int{1}
+	return file_core_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ServerCommand) GetType() ServerCommand_CommandType {
@@ -235,7 +267,7 @@ type AnalysisReport struct {
 
 func (x *AnalysisReport) Reset() {
 	*x = AnalysisReport{}
-	mi := &file_api_proto_core_proto_msgTypes[2]
+	mi := &file_core_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -247,7 +279,7 @@ func (x *AnalysisReport) String() string {
 func (*AnalysisReport) ProtoMessage() {}
 
 func (x *AnalysisReport) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_core_proto_msgTypes[2]
+	mi := &file_core_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -260,7 +292,7 @@ func (x *AnalysisReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnalysisReport.ProtoReflect.Descriptor instead.
 func (*AnalysisReport) Descriptor() ([]byte, []int) {
-	return file_api_proto_core_proto_rawDescGZIP(), []int{2}
+	return file_core_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AnalysisReport) GetType() string {
@@ -286,7 +318,7 @@ type Ack struct {
 
 func (x *Ack) Reset() {
 	*x = Ack{}
-	mi := &file_api_proto_core_proto_msgTypes[3]
+	mi := &file_core_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -298,7 +330,7 @@ func (x *Ack) String() string {
 func (*Ack) ProtoMessage() {}
 
 func (x *Ack) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_core_proto_msgTypes[3]
+	mi := &file_core_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -311,7 +343,7 @@ func (x *Ack) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ack.ProtoReflect.Descriptor instead.
 func (*Ack) Descriptor() ([]byte, []int) {
-	return file_api_proto_core_proto_rawDescGZIP(), []int{3}
+	return file_core_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Ack) GetSuccess() bool {
@@ -321,11 +353,12 @@ func (x *Ack) GetSuccess() bool {
 	return false
 }
 
-var File_api_proto_core_proto protoreflect.FileDescriptor
+var File_core_proto protoreflect.FileDescriptor
 
-const file_api_proto_core_proto_rawDesc = "" +
+const file_core_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/proto/core.proto\x12\tjiaa.core\"\x94\x02\n" +
+	"\n" +
+	"core.proto\x12\tjiaa.core\"\xb6\x03\n" +
 	"\x0fClientHeartbeat\x12\x1b\n" +
 	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12%\n" +
 	"\x0emouse_distance\x18\x02 \x01(\x05R\rmouseDistance\x12\x1f\n" +
@@ -335,7 +368,13 @@ const file_api_proto_core_proto_rawDesc = "" +
 	"\n" +
 	"is_os_idle\x18\x05 \x01(\bR\bisOsIdle\x12$\n" +
 	"\x0eis_eyes_closed\x18\x06 \x01(\bR\fisEyesClosed\x12/\n" +
-	"\x13concentration_score\x18\a \x01(\x02R\x12concentrationScore\"\xc1\x01\n" +
+	"\x13concentration_score\x18\a \x01(\x02R\x12concentrationScore\x12)\n" +
+	"\x10keyboard_entropy\x18\b \x01(\x02R\x0fkeyboardEntropy\x12.\n" +
+	"\x13active_window_title\x18\t \x01(\tR\x11activeWindowTitle\x12\x1f\n" +
+	"\vis_dragging\x18\n" +
+	" \x01(\bR\n" +
+	"isDragging\x12$\n" +
+	"\x0eavg_dwell_time\x18\v \x01(\x01R\favgDwellTime\"\xc1\x01\n" +
 	"\rServerCommand\x128\n" +
 	"\x04type\x18\x01 \x01(\x0e2$.jiaa.core.ServerCommand.CommandTypeR\x04type\x12\x18\n" +
 	"\apayload\x18\x02 \x01(\tR\apayload\"\\\n" +
@@ -358,27 +397,27 @@ const file_api_proto_core_proto_rawDesc = "" +
 	"\x14com.jiaa.common.coreP\x01Z\x1ajiaa-server-core/pkg/protob\x06proto3"
 
 var (
-	file_api_proto_core_proto_rawDescOnce sync.Once
-	file_api_proto_core_proto_rawDescData []byte
+	file_core_proto_rawDescOnce sync.Once
+	file_core_proto_rawDescData []byte
 )
 
-func file_api_proto_core_proto_rawDescGZIP() []byte {
-	file_api_proto_core_proto_rawDescOnce.Do(func() {
-		file_api_proto_core_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_proto_core_proto_rawDesc), len(file_api_proto_core_proto_rawDesc)))
+func file_core_proto_rawDescGZIP() []byte {
+	file_core_proto_rawDescOnce.Do(func() {
+		file_core_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_proto_rawDesc), len(file_core_proto_rawDesc)))
 	})
-	return file_api_proto_core_proto_rawDescData
+	return file_core_proto_rawDescData
 }
 
-var file_api_proto_core_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_proto_core_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_api_proto_core_proto_goTypes = []any{
+var file_core_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_core_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_core_proto_goTypes = []any{
 	(ServerCommand_CommandType)(0), // 0: jiaa.core.ServerCommand.CommandType
 	(*ClientHeartbeat)(nil),        // 1: jiaa.core.ClientHeartbeat
 	(*ServerCommand)(nil),          // 2: jiaa.core.ServerCommand
 	(*AnalysisReport)(nil),         // 3: jiaa.core.AnalysisReport
 	(*Ack)(nil),                    // 4: jiaa.core.Ack
 }
-var file_api_proto_core_proto_depIdxs = []int32{
+var file_core_proto_depIdxs = []int32{
 	0, // 0: jiaa.core.ServerCommand.type:type_name -> jiaa.core.ServerCommand.CommandType
 	1, // 1: jiaa.core.CoreService.SyncClient:input_type -> jiaa.core.ClientHeartbeat
 	3, // 2: jiaa.core.CoreService.ReportAnalysisResult:input_type -> jiaa.core.AnalysisReport
@@ -391,27 +430,27 @@ var file_api_proto_core_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_api_proto_core_proto_init() }
-func file_api_proto_core_proto_init() {
-	if File_api_proto_core_proto != nil {
+func init() { file_core_proto_init() }
+func file_core_proto_init() {
+	if File_core_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_core_proto_rawDesc), len(file_api_proto_core_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_proto_rawDesc), len(file_core_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_api_proto_core_proto_goTypes,
-		DependencyIndexes: file_api_proto_core_proto_depIdxs,
-		EnumInfos:         file_api_proto_core_proto_enumTypes,
-		MessageInfos:      file_api_proto_core_proto_msgTypes,
+		GoTypes:           file_core_proto_goTypes,
+		DependencyIndexes: file_core_proto_depIdxs,
+		EnumInfos:         file_core_proto_enumTypes,
+		MessageInfos:      file_core_proto_msgTypes,
 	}.Build()
-	File_api_proto_core_proto = out.File
-	file_api_proto_core_proto_goTypes = nil
-	file_api_proto_core_proto_depIdxs = nil
+	File_core_proto = out.File
+	file_core_proto_goTypes = nil
+	file_core_proto_depIdxs = nil
 }
