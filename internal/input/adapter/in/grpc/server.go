@@ -5,6 +5,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
 	portin "jiaa-server-core/internal/input/port/in"
@@ -40,6 +42,12 @@ func (s *InputGrpcServer) Start() error {
 	
 	// Register Services
 	proto.RegisterCoreServiceServer(s.server, s.coreService)
+
+	// Register Health Server
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(s.server, healthServer)
+	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	healthServer.SetServingStatus("jiaa.score.ScoreService", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	// Enable Reflection
 	reflection.Register(s.server)
