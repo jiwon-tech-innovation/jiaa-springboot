@@ -11,22 +11,23 @@ import (
 
 	portin "jiaa-server-core/internal/input/port/in"
 	"jiaa-server-core/internal/input/service"
+	"jiaa-server-core/pkg/auth"
 	"jiaa-server-core/pkg/proto"
 )
 
 // InputGrpcServer manages the gRPC server for incoming client connections (e.g. Vision Service)
 type InputGrpcServer struct {
-	server      *grpc.Server
-	port        string
-	coreService *CoreServiceServer
+	server        *grpc.Server
+	port          string
+	coreService   *CoreServiceServer
 	reflexService portin.ReflexUseCase
 }
 
 // NewInputGrpcServer creates a new gRPC server wrapper
 func NewInputGrpcServer(port string, reflexService portin.ReflexUseCase, scoreService *service.ScoreService) *InputGrpcServer {
 	return &InputGrpcServer{
-		port:        port,
-		coreService: NewCoreServiceServer(reflexService, scoreService),
+		port:          port,
+		coreService:   NewCoreServiceServer(reflexService, scoreService),
 		reflexService: reflexService,
 	}
 }
@@ -38,8 +39,14 @@ func (s *InputGrpcServer) Start() error {
 		return err
 	}
 
-	s.server = grpc.NewServer()
-	
+	// Create JWT Interceptor
+	jwtInterceptor := auth.NewJWTInterceptorFromEnv()
+
+	s.server = grpc.NewServer(
+		grpc.UnaryInterceptor(jwtInterceptor.UnaryInterceptor()),
+		grpc.StreamInterceptor(jwtInterceptor.StreamInterceptor()),
+	)
+
 	// Register Services
 	proto.RegisterCoreServiceServer(s.server, s.coreService)
 

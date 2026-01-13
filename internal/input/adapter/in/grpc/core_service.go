@@ -14,18 +14,18 @@ import (
 	proto "jiaa-server-core/pkg/proto"
 )
 
-	// CoreServiceServer implements the CoreService gRPC server
+// CoreServiceServer implements the CoreService gRPC server
 type CoreServiceServer struct {
 	proto.UnimplementedCoreServiceServer
 	reflexService portin.ReflexUseCase
-	scoreService *service.ScoreService
+	scoreService  *service.ScoreService
 }
 
 // NewCoreServiceServer creates a new instance of CoreServiceServer
 func NewCoreServiceServer(reflexService portin.ReflexUseCase, scoreService *service.ScoreService) *CoreServiceServer {
 	return &CoreServiceServer{
 		reflexService: reflexService,
-		scoreService: scoreService,
+		scoreService:  scoreService,
 	}
 }
 
@@ -38,7 +38,6 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 	var currentScore int = 100
 	var lastAlertTime time.Time
 
-
 	for {
 		// 1. Receive Heartbeat from Client
 		heartbeat, err := stream.Recv()
@@ -50,9 +49,9 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 			log.Printf("[CoreService] Error receiving heartbeat: %v", err)
 			return err
 		}
-		
+
 		// Debug Log
-		log.Printf("[DEBUG] Heartbeat recv: Keys=%d, Mouse=%d, Click=%d, Ent=%.2f, Drag=%v, App='%s'", 
+		log.Printf("[DEBUG] Heartbeat recv: Keys=%d, Mouse=%d, Click=%d, Ent=%.2f, Drag=%v, App='%s'",
 			heartbeat.KeystrokeCount, heartbeat.MouseDistance, heartbeat.ClickCount,
 			heartbeat.KeyboardEntropy, heartbeat.IsDragging, heartbeat.ActiveWindowTitle)
 
@@ -76,7 +75,7 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 			activity.AddMetadata("window_title", heartbeat.ActiveWindowTitle)
 			activity.AddMetadata("is_dragging", fmt.Sprintf("%v", heartbeat.IsDragging))
 			activity.AddMetadata("avg_dwell_time", fmt.Sprintf("%.2f", heartbeat.AvgDwellTime))
-			
+
 			if _, err := s.reflexService.ProcessActivity(*activity); err != nil {
 				log.Printf("[CoreService] Failed to route input activity: %v", err)
 			}
@@ -94,11 +93,10 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 
 		result := s.scoreService.CalculateScore(input)
 		currentScore = result.FinalScore
-		
+
 		if result.State != "FOCUSING" && result.State != "THINKING" && result.State != "NEUTRAL" {
 			log.Printf("[CoreService] State: %s, Score: %d", result.State, currentScore)
 		}
-
 
 		// 4. Command Generation (Feedback) with Cooldown
 		now := time.Now()
@@ -142,34 +140,4 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 func (s *CoreServiceServer) ReportAnalysisResult(ctx context.Context, req *proto.AnalysisReport) (*proto.Ack, error) {
 	log.Printf("[CoreService] Received Analysis Report: %s - %s", req.Type, req.Content)
 	return &proto.Ack{Success: true}, nil
-}
-
-// SendAppList handles app list updates from client
-func (s *CoreServiceServer) SendAppList(ctx context.Context, req *proto.AppListRequest) (*proto.AppListResponse, error) {
-	log.Printf("[CoreService] Received App List (len=%d chars)", len(req.AppsJson))
-	return &proto.AppListResponse{Success: true, Message: "Apps received"}, nil
-}
-
-// TranscribeAudio handles audio stream from client
-func (s *CoreServiceServer) TranscribeAudio(stream proto.CoreService_TranscribeAudioServer) error {
-	log.Println("[CoreService] Audio stream started")
-	for {
-		req, err := stream.Recv()
-		if err == io.EOF {
-			// Finished receiving audio
-			log.Println("[CoreService] Audio stream ended")
-			return stream.SendAndClose(&proto.AudioResponse{
-				Transcript: "(Go Server) Audio received successfully",
-				IsEmergency: false,
-			})
-		}
-		if err != nil {
-			log.Printf("[CoreService] Audio stream error: %v", err)
-			return err
-		}
-		// Process audio chunk (req.AudioData)
-		if req.IsFinal {
-			log.Println("[CoreService] Final audio chunk received")
-		}
-	}
 }
