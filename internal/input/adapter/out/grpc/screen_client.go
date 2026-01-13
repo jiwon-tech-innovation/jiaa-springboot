@@ -1,164 +1,101 @@
 package grpc
 
 import (
-	"context"
 	"log"
-	"time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
+	"jiaa-server-core/internal/input/adapter/in/grpc" // Import for StreamManager
 	"jiaa-server-core/internal/input/domain"
 	"jiaa-server-core/pkg/proto"
 )
 
 // ScreenControlAdapter Dev 3(화면 제어) gRPC 클라이언트 (Driven Adapter)
 type ScreenControlAdapter struct {
-	conn    *grpc.ClientConn
-	client  proto.ScreenControlServiceClient
-	address string
+	// No connection needed, uses StreamManager
 }
 
 // NewScreenControlAdapter ScreenControlAdapter 생성자
-func NewScreenControlAdapter(address string) (*ScreenControlAdapter, error) {
-	conn, err := grpc.NewClient(address,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ScreenControlAdapter{
-		conn:    conn,
-		client:  proto.NewScreenControlServiceClient(conn),
-		address: address,
-	}, nil
+func NewScreenControlAdapter() *ScreenControlAdapter {
+	return &ScreenControlAdapter{}
 }
 
-// NewScreenControlAdapterLazy 지연 연결 생성자 (연결 없이 생성)
+// NewScreenControlAdapterLazy (Deprecated signature kept for compatibility if needed, but ignores address)
 func NewScreenControlAdapterLazy(address string) *ScreenControlAdapter {
-	return &ScreenControlAdapter{
-		address: address,
-	}
+	return &ScreenControlAdapter{}
 }
 
-// Connect gRPC 연결 수립
+// Connect (No-op)
 func (a *ScreenControlAdapter) Connect() error {
-	if a.conn != nil {
-		return nil
-	}
-
-	conn, err := grpc.NewClient(a.address,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return err
-	}
-
-	a.conn = conn
-	a.client = proto.NewScreenControlServiceClient(conn)
-	log.Printf("[SCREEN_CONTROL] Connected to Dev 3: %s", a.address)
 	return nil
 }
 
-// SendToScreenController 화면 제어 명령 전송 (gRPC → Dev 3)
+// SendToScreenController 화면 제어 명령 전송 (Router -> StreamManager -> Client)
 func (a *ScreenControlAdapter) SendToScreenController(cmd domain.SabotageAction) error {
-	if a.conn == nil {
-		if err := a.Connect(); err != nil {
-			log.Printf("[SCREEN_CONTROL] Failed to connect: %v", err)
-			return err
-		}
-	}
+	sm := grpc.GetStreamManager()
+	
+	// Map ActionType to ServerCommandType
+	var commandType proto.ServerCommand_CommandType
+	var payload string = cmd.Message
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// ActionType → VisualEffectType 변환
-	effectType := mapToVisualEffectType(cmd.ActionType)
-
-	req := &proto.VisualCommandRequest{
-		ClientId:   cmd.ClientID,
-		EffectType: effectType,
-		Intensity:  int32(cmd.Intensity),
-		DurationMs: 3000, // 3초 지속
-		Message:    cmd.Message,
-	}
-
-	log.Printf("[SCREEN_CONTROL] Sending visual command to Dev 3: Client: %s, Effect: %v",
-		cmd.ClientID, effectType)
-
-	resp, err := a.client.ExecuteVisualCommand(ctx, req)
-	if err != nil {
-		log.Printf("[SCREEN_CONTROL] gRPC call failed: %v", err)
-		return err
-	}
-
-	if !resp.Success {
-		log.Printf("[SCREEN_CONTROL] Visual command failed: %s", resp.ErrorCode)
-	} else {
-		log.Printf("[SCREEN_CONTROL] Visual command executed successfully")
-	}
-
-	return nil
-}
-
-// SendAIResult AI 결과(Markdown) 전송 (Solution Router → Dev 3)
-func (a *ScreenControlAdapter) SendAIResult(clientID string, markdown string) error {
-	if a.conn == nil {
-		if err := a.Connect(); err != nil {
-			log.Printf("[SCREEN_CONTROL] Failed to connect: %v", err)
-			return err
-		}
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	req := &proto.AIResultRequest{
-		ClientId:   clientID,
-		Markdown:   markdown,
-		Title:      "AI Analysis Result",
-		ResultType: proto.AIResultType_ERROR_SOLUTION,
-	}
-
-	log.Printf("[SCREEN_CONTROL] Sending AI result to Dev 3: Client: %s, Length: %d",
-		clientID, len(markdown))
-
-	resp, err := a.client.DisplayAIResult(ctx, req)
-	if err != nil {
-		log.Printf("[SCREEN_CONTROL] gRPC call failed: %v", err)
-		return err
-	}
-
-	if !resp.Success {
-		log.Printf("[SCREEN_CONTROL] DisplayAIResult failed: %s", resp.ErrorCode)
-	} else {
-		log.Printf("[SCREEN_CONTROL] AI result displayed successfully")
-	}
-
-	return nil
-}
-
-// Close 연결 종료
-func (a *ScreenControlAdapter) Close() error {
-	if a.conn != nil {
-		return a.conn.Close()
-	}
-	return nil
-}
-
-// mapToVisualEffectType ActionType → VisualEffectType 변환
-func mapToVisualEffectType(action domain.ActionType) proto.VisualEffectType {
-	switch action {
+	switch cmd.ActionType {
 	case domain.ActionBlockURL:
-		return proto.VisualEffectType_RED_FLASH
+		commandType = proto.ServerCommand_SHOW_MESSAGE
+		payload = "BLOCK_URL:" + cmd.TargetURL // Protocol agreement needed
 	case domain.ActionCloseApp:
-		return proto.VisualEffectType_SCREEN_GLITCH
+		commandType = proto.ServerCommand_BLOCK_SCREEN
 	case domain.ActionSleepScreen:
-		return proto.VisualEffectType_BLACK_SCREEN
+		commandType = proto.ServerCommand_BLOCK_SCREEN
 	case domain.ActionMinimizeAll:
-		return proto.VisualEffectType_BLUR_OVERLAY
+		commandType = proto.ServerCommand_SHAKE_MOUSE // Using closest available
 	default:
-		return proto.VisualEffectType_SCREEN_SHAKE
+		commandType = proto.ServerCommand_SHAKE_MOUSE
 	}
+
+	serverCmd := &proto.ServerCommand{
+		Type:    commandType,
+		Payload: payload,
+	}
+
+	log.Printf("[SCREEN_CONTROL] Routing command to client via StreamManager: %s", cmd.ClientID)
+	
+	if err := sm.SendCommand(cmd.ClientID, serverCmd); err != nil {
+		log.Printf("[SCREEN_CONTROL] Failed to route via StreamManager: %v", err)
+		return err
+	}
+	
+	return nil
 }
+
+// SendAIResult AI 결과(Markdown) 전송
+func (a *ScreenControlAdapter) SendAIResult(clientID string, markdown string) error {
+	sm := grpc.GetStreamManager()
+
+	// Using SHOW_MESSAGE type to send markdown content
+	// Protocol agreement: Payload starts with "MARKDOWN:"??? 
+	// Or just raw payload if client handles it.
+	// For now, let's assume SHOW_MESSAGE displays it.
+	
+	serverCmd := &proto.ServerCommand{
+		Type:    proto.ServerCommand_SHOW_MESSAGE,
+		Payload: markdown,
+	}
+
+	log.Printf("[SCREEN_CONTROL] Routing AI Result to client via StreamManager: %s", clientID)
+	
+	if err := sm.SendCommand(clientID, serverCmd); err != nil {
+		log.Printf("[SCREEN_CONTROL] Failed to route AI Result: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+// Close (No-op)
+func (a *ScreenControlAdapter) Close() error {
+	return nil
+}
+
+func mapToVisualEffectType(action domain.ActionType) proto.VisualEffectType {
+	// Kept for reference or future use if proto creates VisualEffectType
+	return proto.VisualEffectType_SCREEN_SHAKE
+}
+
