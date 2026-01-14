@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v6.31.1
-// source: core.proto
+// source: api/proto/core.proto
 
 package proto
 
@@ -60,11 +60,11 @@ func (x ServerCommand_CommandType) String() string {
 }
 
 func (ServerCommand_CommandType) Descriptor() protoreflect.EnumDescriptor {
-	return file_core_proto_enumTypes[0].Descriptor()
+	return file_api_proto_core_proto_enumTypes[0].Descriptor()
 }
 
 func (ServerCommand_CommandType) Type() protoreflect.EnumType {
-	return &file_core_proto_enumTypes[0]
+	return &file_api_proto_core_proto_enumTypes[0]
 }
 
 func (x ServerCommand_CommandType) Number() protoreflect.EnumNumber {
@@ -73,7 +73,7 @@ func (x ServerCommand_CommandType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServerCommand_CommandType.Descriptor instead.
 func (ServerCommand_CommandType) EnumDescriptor() ([]byte, []int) {
-	return file_core_proto_rawDescGZIP(), []int{1, 0}
+	return file_api_proto_core_proto_rawDescGZIP(), []int{1, 0}
 }
 
 // --- 클라이언트 -> 서버 (1초마다 전송) ---
@@ -98,7 +98,7 @@ type ClientHeartbeat struct {
 
 func (x *ClientHeartbeat) Reset() {
 	*x = ClientHeartbeat{}
-	mi := &file_core_proto_msgTypes[0]
+	mi := &file_api_proto_core_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +110,7 @@ func (x *ClientHeartbeat) String() string {
 func (*ClientHeartbeat) ProtoMessage() {}
 
 func (x *ClientHeartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_core_proto_msgTypes[0]
+	mi := &file_api_proto_core_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +123,7 @@ func (x *ClientHeartbeat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientHeartbeat.ProtoReflect.Descriptor instead.
 func (*ClientHeartbeat) Descriptor() ([]byte, []int) {
-	return file_core_proto_rawDescGZIP(), []int{0}
+	return file_api_proto_core_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ClientHeartbeat) GetClientId() string {
@@ -214,7 +214,7 @@ type ServerCommand struct {
 
 func (x *ServerCommand) Reset() {
 	*x = ServerCommand{}
-	mi := &file_core_proto_msgTypes[1]
+	mi := &file_api_proto_core_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +226,7 @@ func (x *ServerCommand) String() string {
 func (*ServerCommand) ProtoMessage() {}
 
 func (x *ServerCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_core_proto_msgTypes[1]
+	mi := &file_api_proto_core_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,7 +239,7 @@ func (x *ServerCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCommand.ProtoReflect.Descriptor instead.
 func (*ServerCommand) Descriptor() ([]byte, []int) {
-	return file_core_proto_rawDescGZIP(), []int{1}
+	return file_api_proto_core_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ServerCommand) GetType() ServerCommand_CommandType {
@@ -267,7 +267,7 @@ type AnalysisReport struct {
 
 func (x *AnalysisReport) Reset() {
 	*x = AnalysisReport{}
-	mi := &file_core_proto_msgTypes[2]
+	mi := &file_api_proto_core_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -279,7 +279,7 @@ func (x *AnalysisReport) String() string {
 func (*AnalysisReport) ProtoMessage() {}
 
 func (x *AnalysisReport) ProtoReflect() protoreflect.Message {
-	mi := &file_core_proto_msgTypes[2]
+	mi := &file_api_proto_core_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -292,7 +292,7 @@ func (x *AnalysisReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnalysisReport.ProtoReflect.Descriptor instead.
 func (*AnalysisReport) Descriptor() ([]byte, []int) {
-	return file_core_proto_rawDescGZIP(), []int{2}
+	return file_api_proto_core_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AnalysisReport) GetType() string {
@@ -318,7 +318,7 @@ type Ack struct {
 
 func (x *Ack) Reset() {
 	*x = Ack{}
-	mi := &file_core_proto_msgTypes[3]
+	mi := &file_api_proto_core_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +330,7 @@ func (x *Ack) String() string {
 func (*Ack) ProtoMessage() {}
 
 func (x *Ack) ProtoReflect() protoreflect.Message {
-	mi := &file_core_proto_msgTypes[3]
+	mi := &file_api_proto_core_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +343,7 @@ func (x *Ack) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ack.ProtoReflect.Descriptor instead.
 func (*Ack) Descriptor() ([]byte, []int) {
-	return file_core_proto_rawDescGZIP(), []int{3}
+	return file_api_proto_core_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Ack) GetSuccess() bool {
@@ -353,12 +353,275 @@ func (x *Ack) GetSuccess() bool {
 	return false
 }
 
-var File_core_proto protoreflect.FileDescriptor
+type AppListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppsJson      string                 `protobuf:"bytes,1,opt,name=apps_json,json=appsJson,proto3" json:"apps_json,omitempty"` // 실행 중인 앱 목록 JSON (["Chrome", "VS Code", ...])
+	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // 전송 시간
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_core_proto_rawDesc = "" +
+func (x *AppListRequest) Reset() {
+	*x = AppListRequest{}
+	mi := &file_api_proto_core_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppListRequest) ProtoMessage() {}
+
+func (x *AppListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_core_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppListRequest.ProtoReflect.Descriptor instead.
+func (*AppListRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_core_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AppListRequest) GetAppsJson() string {
+	if x != nil {
+		return x.AppsJson
+	}
+	return ""
+}
+
+func (x *AppListRequest) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+type AppListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`                     // 수신 성공 여부
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`                      // 응답 메시지
+	Command       string                 `protobuf:"bytes,3,opt,name=command,proto3" json:"command,omitempty"`                      // 명령 (e.g. "KILL")
+	TargetApp     string                 `protobuf:"bytes,4,opt,name=target_app,json=targetApp,proto3" json:"target_app,omitempty"` // 대상 앱 (e.g. "Minecraft")
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppListResponse) Reset() {
+	*x = AppListResponse{}
+	mi := &file_api_proto_core_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppListResponse) ProtoMessage() {}
+
+func (x *AppListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_core_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppListResponse.ProtoReflect.Descriptor instead.
+func (*AppListResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_core_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *AppListResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *AppListResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *AppListResponse) GetCommand() string {
+	if x != nil {
+		return x.Command
+	}
+	return ""
+}
+
+func (x *AppListResponse) GetTargetApp() string {
+	if x != nil {
+		return x.TargetApp
+	}
+	return ""
+}
+
+type AudioRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AudioData     []byte                 `protobuf:"bytes,1,opt,name=audio_data,json=audioData,proto3" json:"audio_data,omitempty"`               // VAD로 걸러진 음성 바이너리
+	IsFinal       bool                   `protobuf:"varint,2,opt,name=is_final,json=isFinal,proto3" json:"is_final,omitempty"`                    // True = "문장 끝났음(침묵 1초 감지)"
+	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                               // 로깅용 시간
+	MediaInfoJson string                 `protobuf:"bytes,4,opt,name=media_info_json,json=mediaInfoJson,proto3" json:"media_info_json,omitempty"` // 미디어 정보 JSON
+	ProcessInfo   string                 `protobuf:"bytes,10,opt,name=process_info,json=processInfo,proto3" json:"process_info,omitempty"`        // (추가) 현재 활성 프로세스 정보 (JSON)
+	Windows       string                 `protobuf:"bytes,11,opt,name=windows,proto3" json:"windows,omitempty"`                                   // (추가) 열린 창 목록 정보 (JSON)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioRequest) Reset() {
+	*x = AudioRequest{}
+	mi := &file_api_proto_core_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioRequest) ProtoMessage() {}
+
+func (x *AudioRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_core_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioRequest.ProtoReflect.Descriptor instead.
+func (*AudioRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_core_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AudioRequest) GetAudioData() []byte {
+	if x != nil {
+		return x.AudioData
+	}
+	return nil
+}
+
+func (x *AudioRequest) GetIsFinal() bool {
+	if x != nil {
+		return x.IsFinal
+	}
+	return false
+}
+
+func (x *AudioRequest) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *AudioRequest) GetMediaInfoJson() string {
+	if x != nil {
+		return x.MediaInfoJson
+	}
+	return ""
+}
+
+func (x *AudioRequest) GetProcessInfo() string {
+	if x != nil {
+		return x.ProcessInfo
+	}
+	return ""
+}
+
+func (x *AudioRequest) GetWindows() string {
+	if x != nil {
+		return x.Windows
+	}
+	return ""
+}
+
+type AudioResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Transcript    string                 `protobuf:"bytes,1,opt,name=transcript,proto3" json:"transcript,omitempty"`                       // 변환된 텍스트
+	IsEmergency   bool                   `protobuf:"varint,2,opt,name=is_emergency,json=isEmergency,proto3" json:"is_emergency,omitempty"` // 위급 상황 여부
+	Intent        string                 `protobuf:"bytes,3,opt,name=intent,proto3" json:"intent,omitempty"`                               // 의도 분석 결과
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioResponse) Reset() {
+	*x = AudioResponse{}
+	mi := &file_api_proto_core_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioResponse) ProtoMessage() {}
+
+func (x *AudioResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_core_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioResponse.ProtoReflect.Descriptor instead.
+func (*AudioResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_core_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AudioResponse) GetTranscript() string {
+	if x != nil {
+		return x.Transcript
+	}
+	return ""
+}
+
+func (x *AudioResponse) GetIsEmergency() bool {
+	if x != nil {
+		return x.IsEmergency
+	}
+	return false
+}
+
+func (x *AudioResponse) GetIntent() string {
+	if x != nil {
+		return x.Intent
+	}
+	return ""
+}
+
+var File_api_proto_core_proto protoreflect.FileDescriptor
+
+const file_api_proto_core_proto_rawDesc = "" +
 	"\n" +
-	"\n" +
-	"core.proto\x12\tjiaa.core\"\xb6\x03\n" +
+	"\x14api/proto/core.proto\x12\tjiaa.core\"\xb6\x03\n" +
 	"\x0fClientHeartbeat\x12\x1b\n" +
 	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12%\n" +
 	"\x0emouse_distance\x18\x02 \x01(\x05R\rmouseDistance\x12\x1f\n" +
@@ -389,68 +652,102 @@ const file_core_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"\x1f\n" +
 	"\x03Ack\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x98\x01\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"K\n" +
+	"\x0eAppListRequest\x12\x1b\n" +
+	"\tapps_json\x18\x01 \x01(\tR\bappsJson\x12\x1c\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"~\n" +
+	"\x0fAppListResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\acommand\x18\x03 \x01(\tR\acommand\x12\x1d\n" +
+	"\n" +
+	"target_app\x18\x04 \x01(\tR\ttargetApp\"\xcb\x01\n" +
+	"\fAudioRequest\x12\x1d\n" +
+	"\n" +
+	"audio_data\x18\x01 \x01(\fR\taudioData\x12\x19\n" +
+	"\bis_final\x18\x02 \x01(\bR\aisFinal\x12\x1c\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\x12&\n" +
+	"\x0fmedia_info_json\x18\x04 \x01(\tR\rmediaInfoJson\x12!\n" +
+	"\fprocess_info\x18\n" +
+	" \x01(\tR\vprocessInfo\x12\x18\n" +
+	"\awindows\x18\v \x01(\tR\awindows\"j\n" +
+	"\rAudioResponse\x12\x1e\n" +
+	"\n" +
+	"transcript\x18\x01 \x01(\tR\n" +
+	"transcript\x12!\n" +
+	"\fis_emergency\x18\x02 \x01(\bR\visEmergency\x12\x16\n" +
+	"\x06intent\x18\x03 \x01(\tR\x06intent2\xa6\x02\n" +
 	"\vCoreService\x12F\n" +
 	"\n" +
 	"SyncClient\x12\x1a.jiaa.core.ClientHeartbeat\x1a\x18.jiaa.core.ServerCommand(\x010\x01\x12A\n" +
-	"\x14ReportAnalysisResult\x12\x19.jiaa.core.AnalysisReport\x1a\x0e.jiaa.core.AckB4\n" +
+	"\x14ReportAnalysisResult\x12\x19.jiaa.core.AnalysisReport\x1a\x0e.jiaa.core.Ack\x12D\n" +
+	"\vSendAppList\x12\x19.jiaa.core.AppListRequest\x1a\x1a.jiaa.core.AppListResponse\x12F\n" +
+	"\x0fTranscribeAudio\x12\x17.jiaa.core.AudioRequest\x1a\x18.jiaa.core.AudioResponse(\x01B4\n" +
 	"\x14com.jiaa.common.coreP\x01Z\x1ajiaa-server-core/pkg/protob\x06proto3"
 
 var (
-	file_core_proto_rawDescOnce sync.Once
-	file_core_proto_rawDescData []byte
+	file_api_proto_core_proto_rawDescOnce sync.Once
+	file_api_proto_core_proto_rawDescData []byte
 )
 
-func file_core_proto_rawDescGZIP() []byte {
-	file_core_proto_rawDescOnce.Do(func() {
-		file_core_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_proto_rawDesc), len(file_core_proto_rawDesc)))
+func file_api_proto_core_proto_rawDescGZIP() []byte {
+	file_api_proto_core_proto_rawDescOnce.Do(func() {
+		file_api_proto_core_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_proto_core_proto_rawDesc), len(file_api_proto_core_proto_rawDesc)))
 	})
-	return file_core_proto_rawDescData
+	return file_api_proto_core_proto_rawDescData
 }
 
-var file_core_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_core_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_core_proto_goTypes = []any{
+var file_api_proto_core_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_api_proto_core_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_api_proto_core_proto_goTypes = []any{
 	(ServerCommand_CommandType)(0), // 0: jiaa.core.ServerCommand.CommandType
 	(*ClientHeartbeat)(nil),        // 1: jiaa.core.ClientHeartbeat
 	(*ServerCommand)(nil),          // 2: jiaa.core.ServerCommand
 	(*AnalysisReport)(nil),         // 3: jiaa.core.AnalysisReport
 	(*Ack)(nil),                    // 4: jiaa.core.Ack
+	(*AppListRequest)(nil),         // 5: jiaa.core.AppListRequest
+	(*AppListResponse)(nil),        // 6: jiaa.core.AppListResponse
+	(*AudioRequest)(nil),           // 7: jiaa.core.AudioRequest
+	(*AudioResponse)(nil),          // 8: jiaa.core.AudioResponse
 }
-var file_core_proto_depIdxs = []int32{
+var file_api_proto_core_proto_depIdxs = []int32{
 	0, // 0: jiaa.core.ServerCommand.type:type_name -> jiaa.core.ServerCommand.CommandType
 	1, // 1: jiaa.core.CoreService.SyncClient:input_type -> jiaa.core.ClientHeartbeat
 	3, // 2: jiaa.core.CoreService.ReportAnalysisResult:input_type -> jiaa.core.AnalysisReport
-	2, // 3: jiaa.core.CoreService.SyncClient:output_type -> jiaa.core.ServerCommand
-	4, // 4: jiaa.core.CoreService.ReportAnalysisResult:output_type -> jiaa.core.Ack
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	5, // 3: jiaa.core.CoreService.SendAppList:input_type -> jiaa.core.AppListRequest
+	7, // 4: jiaa.core.CoreService.TranscribeAudio:input_type -> jiaa.core.AudioRequest
+	2, // 5: jiaa.core.CoreService.SyncClient:output_type -> jiaa.core.ServerCommand
+	4, // 6: jiaa.core.CoreService.ReportAnalysisResult:output_type -> jiaa.core.Ack
+	6, // 7: jiaa.core.CoreService.SendAppList:output_type -> jiaa.core.AppListResponse
+	8, // 8: jiaa.core.CoreService.TranscribeAudio:output_type -> jiaa.core.AudioResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_core_proto_init() }
-func file_core_proto_init() {
-	if File_core_proto != nil {
+func init() { file_api_proto_core_proto_init() }
+func file_api_proto_core_proto_init() {
+	if File_api_proto_core_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_proto_rawDesc), len(file_core_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_core_proto_rawDesc), len(file_api_proto_core_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_core_proto_goTypes,
-		DependencyIndexes: file_core_proto_depIdxs,
-		EnumInfos:         file_core_proto_enumTypes,
-		MessageInfos:      file_core_proto_msgTypes,
+		GoTypes:           file_api_proto_core_proto_goTypes,
+		DependencyIndexes: file_api_proto_core_proto_depIdxs,
+		EnumInfos:         file_api_proto_core_proto_enumTypes,
+		MessageInfos:      file_api_proto_core_proto_msgTypes,
 	}.Build()
-	File_core_proto = out.File
-	file_core_proto_goTypes = nil
-	file_core_proto_depIdxs = nil
+	File_api_proto_core_proto = out.File
+	file_api_proto_core_proto_goTypes = nil
+	file_api_proto_core_proto_depIdxs = nil
 }

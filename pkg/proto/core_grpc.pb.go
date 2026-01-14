@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v6.31.1
-// source: core.proto
+// source: api/proto/core.proto
 
 package proto
 
@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CoreService_SyncClient_FullMethodName           = "/jiaa.core.CoreService/SyncClient"
 	CoreService_ReportAnalysisResult_FullMethodName = "/jiaa.core.CoreService/ReportAnalysisResult"
+	CoreService_SendAppList_FullMethodName          = "/jiaa.core.CoreService/SendAppList"
+	CoreService_TranscribeAudio_FullMethodName      = "/jiaa.core.CoreService/TranscribeAudio"
 )
 
 // CoreServiceClient is the client API for CoreService service.
@@ -31,6 +33,10 @@ type CoreServiceClient interface {
 	SyncClient(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ClientHeartbeat, ServerCommand], error)
 	// 2. AI 분석 결과 보고 (윤성 -> 승민)
 	ReportAnalysisResult(ctx context.Context, in *AnalysisReport, opts ...grpc.CallOption) (*Ack, error)
+	// 3. 실행 중인 앱 목록 전송 (변경 시에만)
+	SendAppList(ctx context.Context, in *AppListRequest, opts ...grpc.CallOption) (*AppListResponse, error)
+	// 4. 음성 스트리밍 -> STT 변환
+	TranscribeAudio(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[AudioRequest, AudioResponse], error)
 }
 
 type coreServiceClient struct {
@@ -64,6 +70,29 @@ func (c *coreServiceClient) ReportAnalysisResult(ctx context.Context, in *Analys
 	return out, nil
 }
 
+func (c *coreServiceClient) SendAppList(ctx context.Context, in *AppListRequest, opts ...grpc.CallOption) (*AppListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AppListResponse)
+	err := c.cc.Invoke(ctx, CoreService_SendAppList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreServiceClient) TranscribeAudio(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[AudioRequest, AudioResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CoreService_ServiceDesc.Streams[1], CoreService_TranscribeAudio_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[AudioRequest, AudioResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CoreService_TranscribeAudioClient = grpc.ClientStreamingClient[AudioRequest, AudioResponse]
+
 // CoreServiceServer is the server API for CoreService service.
 // All implementations must embed UnimplementedCoreServiceServer
 // for forward compatibility.
@@ -72,6 +101,10 @@ type CoreServiceServer interface {
 	SyncClient(grpc.BidiStreamingServer[ClientHeartbeat, ServerCommand]) error
 	// 2. AI 분석 결과 보고 (윤성 -> 승민)
 	ReportAnalysisResult(context.Context, *AnalysisReport) (*Ack, error)
+	// 3. 실행 중인 앱 목록 전송 (변경 시에만)
+	SendAppList(context.Context, *AppListRequest) (*AppListResponse, error)
+	// 4. 음성 스트리밍 -> STT 변환
+	TranscribeAudio(grpc.ClientStreamingServer[AudioRequest, AudioResponse]) error
 	mustEmbedUnimplementedCoreServiceServer()
 }
 
@@ -87,6 +120,12 @@ func (UnimplementedCoreServiceServer) SyncClient(grpc.BidiStreamingServer[Client
 }
 func (UnimplementedCoreServiceServer) ReportAnalysisResult(context.Context, *AnalysisReport) (*Ack, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReportAnalysisResult not implemented")
+}
+func (UnimplementedCoreServiceServer) SendAppList(context.Context, *AppListRequest) (*AppListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendAppList not implemented")
+}
+func (UnimplementedCoreServiceServer) TranscribeAudio(grpc.ClientStreamingServer[AudioRequest, AudioResponse]) error {
+	return status.Error(codes.Unimplemented, "method TranscribeAudio not implemented")
 }
 func (UnimplementedCoreServiceServer) mustEmbedUnimplementedCoreServiceServer() {}
 func (UnimplementedCoreServiceServer) testEmbeddedByValue()                     {}
@@ -134,6 +173,31 @@ func _CoreService_ReportAnalysisResult_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreService_SendAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServiceServer).SendAppList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreService_SendAppList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServiceServer).SendAppList(ctx, req.(*AppListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreService_TranscribeAudio_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(CoreServiceServer).TranscribeAudio(&grpc.GenericServerStream[AudioRequest, AudioResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CoreService_TranscribeAudioServer = grpc.ClientStreamingServer[AudioRequest, AudioResponse]
+
 // CoreService_ServiceDesc is the grpc.ServiceDesc for CoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -145,6 +209,10 @@ var CoreService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ReportAnalysisResult",
 			Handler:    _CoreService_ReportAnalysisResult_Handler,
 		},
+		{
+			MethodName: "SendAppList",
+			Handler:    _CoreService_SendAppList_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -153,6 +221,11 @@ var CoreService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "TranscribeAudio",
+			Handler:       _CoreService_TranscribeAudio_Handler,
+			ClientStreams: true,
+		},
 	},
-	Metadata: "core.proto",
+	Metadata: "api/proto/core.proto",
 }
