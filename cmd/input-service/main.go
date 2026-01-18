@@ -6,6 +6,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -45,6 +50,46 @@ func main() {
 	// Blacklist Adapter (인메모리 - 기본 블랙리스트 포함)
 	blacklistAdapter := memory.NewBlacklistAdapterWithDefaults()
 	log.Printf("[MAIN] Blacklist adapter initialized with defaults")
+
+	// [LOCAL HOTFIX] Fetch Blacklist from Data Service (localhost:8083)
+	// We do this in a goroutine to not block startup, but with a small delay to ensure adapter is ready
+	go func() {
+		time.Sleep(2 * time.Second) // Wait for server to start
+		url := "http://localhost:8083/api/v1/blacklist"
+		log.Printf("[MAIN] Fetching external blacklist from %s...", url)
+
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Printf("[MAIN] Failed to fetch blacklist: %v", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("[MAIN] Failed to read blacklist body: %v", err)
+			return
+		}
+
+		var result struct {
+			Success bool `json:"success"`
+			Data    []struct {
+				AppName string `json:"appName"`
+			} `json:"data"`
+		}
+
+		if err := json.Unmarshal(body, &result); err != nil {
+			log.Printf("[MAIN] Failed to parse blacklist JSON: %v", err)
+			return
+		}
+
+		count := 0
+		for _, item := range result.Data {
+			blacklistAdapter.AddAppToBlacklist(item.AppName)
+			count++
+		}
+		log.Printf("[MAIN] Successfully synced %d apps from Data Service.", count)
+	}()
 
 	// Kafka Producer (→ Dev 6)
 	dataRelayAdapter, err := kafkaOut.NewDataRelayAdapter(config.KafkaBrokers, config.ActivityTopic)
