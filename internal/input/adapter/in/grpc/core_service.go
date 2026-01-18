@@ -13,19 +13,19 @@ import (
 	proto "jiaa-server-core/pkg/proto"
 )
 
-	// CoreServiceServer implements the CoreService gRPC server
+// CoreServiceServer implements the CoreService gRPC server
 type CoreServiceServer struct {
 	proto.UnimplementedCoreServiceServer
-	reflexService portin.ReflexUseCase
-	scoreService *service.ScoreService
+	reflexService       portin.ReflexUseCase
+	scoreService        *service.ScoreService
 	intelligenceService portout.IntelligencePort
 }
 
 // NewCoreServiceServer creates a new instance of CoreServiceServer
 func NewCoreServiceServer(reflexService portin.ReflexUseCase, scoreService *service.ScoreService, intelligenceService portout.IntelligencePort) *CoreServiceServer {
 	return &CoreServiceServer{
-		reflexService: reflexService,
-		scoreService: scoreService,
+		reflexService:       reflexService,
+		scoreService:        scoreService,
 		intelligenceService: intelligenceService,
 	}
 }
@@ -40,7 +40,7 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 		log.Printf("[CoreService] Failed to receive first heartbeat: %v", err)
 		return err
 	}
-	
+
 	clientID := firstMsg.ClientId
 	if clientID == "" {
 		clientID = "unknown"
@@ -64,7 +64,7 @@ func (s *CoreServiceServer) SyncClient(stream proto.CoreService_SyncClientServer
 			log.Printf("[CoreService] Error receiving heartbeat: %v", err)
 			return err
 		}
-		
+
 		s.processHeartbeat(heartbeat)
 	}
 	return nil
@@ -76,7 +76,7 @@ func (s *CoreServiceServer) processHeartbeat(heartbeat *proto.ClientHeartbeat) {
 
 	// 2. Aggregate Data and Route to ReflexService -> Kafka
 	osActivity := int(heartbeat.KeystrokeCount) + int(heartbeat.ClickCount) + int(heartbeat.MouseDistance)
-	
+
 	if osActivity > 0 || heartbeat.IsEyesClosed {
 		activity := domain.NewClientActivity(heartbeat.ClientId, domain.ActivityInputUsage)
 		activity.AddMetadata("keystroke_count", fmt.Sprintf("%d", heartbeat.KeystrokeCount))
@@ -86,7 +86,7 @@ func (s *CoreServiceServer) processHeartbeat(heartbeat *proto.ClientHeartbeat) {
 		activity.AddMetadata("window_title", heartbeat.ActiveWindowTitle)
 		activity.AddMetadata("is_dragging", fmt.Sprintf("%v", heartbeat.IsDragging))
 		activity.AddMetadata("avg_dwell_time", fmt.Sprintf("%.2f", heartbeat.AvgDwellTime))
-		
+
 		// [Reflex Check] - Local Fast Path (e.g. Blacklist)
 		if _, err := s.reflexService.ProcessActivity(*activity); err != nil {
 			log.Printf("[CoreService] Failed to route activity: %v", err)
@@ -103,18 +103,18 @@ func (s *CoreServiceServer) ReportAnalysisResult(ctx context.Context, req *proto
 // SendAppList handles app list updates from client (Forwards to AI)
 func (s *CoreServiceServer) SendAppList(ctx context.Context, req *proto.AppListRequest) (*proto.AppListResponse, error) {
 	// log.Printf("[CoreService] Forwarding App List to AI (len=%d chars)", len(req.AppsJson))
-	
+
 	msg, cmd, target, err := s.intelligenceService.SendAppList(req.AppsJson)
 	if err != nil {
 		log.Printf("[CoreService] Failed to forward to AI: %v", err)
 		// 에러 발생해도 클라가 크래시나지 않게 성공 처리하되 메시지 전달
 		return &proto.AppListResponse{Success: false, Message: fmt.Sprintf("AI Server Error: %v", err)}, nil
 	}
-	
+
 	return &proto.AppListResponse{
-		Success: true, 
-		Message: msg,
-		Command: cmd,
+		Success:   true,
+		Message:   msg,
+		Command:   cmd,
 		TargetApp: target,
 	}, nil
 }
@@ -128,7 +128,7 @@ func (s *CoreServiceServer) TranscribeAudio(stream proto.CoreService_TranscribeA
 			// Finished receiving audio
 			log.Println("[CoreService] Audio stream ended")
 			return stream.SendAndClose(&proto.AudioResponse{
-				Transcript: "(Go Server) Audio received successfully",
+				Transcript:  "(Go Server) Audio received successfully",
 				IsEmergency: false,
 			})
 		}

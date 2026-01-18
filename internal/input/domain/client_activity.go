@@ -6,11 +6,11 @@ import "time"
 type ActivityType string
 
 const (
-	ActivityURLVisit  ActivityType = "URL_VISIT"
-	ActivityAppOpen   ActivityType = "APP_OPEN"
-	ActivityAppClose  ActivityType = "APP_CLOSE"
-	ActivityIdleStart ActivityType = "IDLE_START"
-	ActivityIdleEnd   ActivityType = "IDLE_END"
+	ActivityURLVisit   ActivityType = "URL_VISIT"
+	ActivityAppOpen    ActivityType = "APP_OPEN"
+	ActivityAppClose   ActivityType = "APP_CLOSE"
+	ActivityIdleStart  ActivityType = "IDLE_START"
+	ActivityIdleEnd    ActivityType = "IDLE_END"
 	ActivityInputUsage ActivityType = "INPUT_USAGE"
 )
 

@@ -30,7 +30,7 @@ type CalculateResult struct {
 // CalculateScore 사용자의 상태와 점수를 계산
 func (s *ScoreService) CalculateScore(input CalculateInput) CalculateResult {
 	// 1단계: "즉결 처형" (Sanctions) - 최우선 순위
-	
+
 	// 졸음 감지 (Sleep)
 	// 조건: eyes_closed == true (3초 이상 지속) OR head_pitch < -20 (고개 숙임)
 	isSleeping := input.EyesClosedDurationSec >= 3.0 || input.HeadPitch < -20.0
@@ -68,7 +68,7 @@ func (s *ScoreService) CalculateScore(input CalculateInput) CalculateResult {
 		// Final = (Vision * 0.6) + (OS_Norm * 0.4)
 		weighted := (float64(input.VisionScore) * 0.6) + (osNorm * 0.4)
 		finalScore := int(math.Round(weighted))
-		
+
 		return CalculateResult{FinalScore: finalScore, State: "FOCUSING"}
 	}
 

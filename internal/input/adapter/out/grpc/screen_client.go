@@ -31,7 +31,7 @@ func (a *ScreenControlAdapter) Connect() error {
 // SendToScreenController 화면 제어 명령 전송 (Router -> StreamManager -> Client)
 func (a *ScreenControlAdapter) SendToScreenController(cmd domain.SabotageAction) error {
 	sm := grpc.GetStreamManager()
-	
+
 	// Map ActionType to ServerCommandType
 	var commandType proto.ServerCommand_CommandType
 	var payload string = cmd.Message
@@ -56,12 +56,12 @@ func (a *ScreenControlAdapter) SendToScreenController(cmd domain.SabotageAction)
 	}
 
 	log.Printf("[SCREEN_CONTROL] Routing command to client via StreamManager: %s", cmd.ClientID)
-	
+
 	if err := sm.SendCommand(cmd.ClientID, serverCmd); err != nil {
 		log.Printf("[SCREEN_CONTROL] Failed to route via StreamManager: %v", err)
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -70,17 +70,17 @@ func (a *ScreenControlAdapter) SendAIResult(clientID string, markdown string) er
 	sm := grpc.GetStreamManager()
 
 	// Using SHOW_MESSAGE type to send markdown content
-	// Protocol agreement: Payload starts with "MARKDOWN:"??? 
+	// Protocol agreement: Payload starts with "MARKDOWN:"???
 	// Or just raw payload if client handles it.
 	// For now, let's assume SHOW_MESSAGE displays it.
-	
+
 	serverCmd := &proto.ServerCommand{
 		Type:    proto.ServerCommand_SHOW_MESSAGE,
 		Payload: markdown,
 	}
 
 	log.Printf("[SCREEN_CONTROL] Routing AI Result to client via StreamManager: %s", clientID)
-	
+
 	if err := sm.SendCommand(clientID, serverCmd); err != nil {
 		log.Printf("[SCREEN_CONTROL] Failed to route AI Result: %v", err)
 		return err
@@ -98,4 +98,3 @@ func mapToVisualEffectType(action domain.ActionType) proto.VisualEffectType {
 	// Kept for reference or future use if proto creates VisualEffectType
 	return proto.VisualEffectType_SCREEN_SHAKE
 }
-

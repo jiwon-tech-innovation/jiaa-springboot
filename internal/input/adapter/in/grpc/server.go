@@ -17,17 +17,17 @@ import (
 
 // InputGrpcServer manages the gRPC server for incoming client connections (e.g. Vision Service)
 type InputGrpcServer struct {
-	server      *grpc.Server
-	port        string
-	coreService *CoreServiceServer
+	server        *grpc.Server
+	port          string
+	coreService   *CoreServiceServer
 	reflexService portin.ReflexUseCase
 }
 
 // NewInputGrpcServer creates a new gRPC server wrapper
 func NewInputGrpcServer(port string, reflexService portin.ReflexUseCase, scoreService *service.ScoreService, intelligencePort portout.IntelligencePort) *InputGrpcServer {
 	return &InputGrpcServer{
-		port:        port,
-		coreService: NewCoreServiceServer(reflexService, scoreService, intelligencePort),
+		port:          port,
+		coreService:   NewCoreServiceServer(reflexService, scoreService, intelligencePort),
 		reflexService: reflexService,
 	}
 }
@@ -40,7 +40,7 @@ func (s *InputGrpcServer) Start() error {
 	}
 
 	s.server = grpc.NewServer()
-	
+
 	// Register Services
 	proto.RegisterCoreServiceServer(s.server, s.coreService)
 
