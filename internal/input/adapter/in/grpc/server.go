@@ -12,7 +12,6 @@ import (
 	portin "jiaa-server-core/internal/input/port/in"
 	portout "jiaa-server-core/internal/input/port/out"
 	"jiaa-server-core/internal/input/service"
-	"jiaa-server-core/pkg/auth"
 	"jiaa-server-core/pkg/proto"
 )
 
