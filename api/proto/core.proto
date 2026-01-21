@@ -37,6 +37,12 @@ message ClientHeartbeat {
   string active_window_title = 9; // 활성 창 제목
   bool is_dragging = 10;          // 마우스 드래그 여부
   double avg_dwell_time = 11;     // 평균 키 누름 시간 (ms)
+  
+  // 시간 추적 데이터 (초 단위, 델타 값)
+  float focus_time = 12;          // 집중 시간 (초)
+  float sleep_time = 13;          // 졸음 시간 (초)
+  float away_time = 14;           // 자리 비움 시간 (초)
+  float distraction_time = 15;   // 딴짓 시간 (초)
 }
 
 // --- 서버 -> 클라이언트 (명령) ---

@@ -77,7 +77,11 @@ func (s *CoreServiceServer) processHeartbeat(heartbeat *proto.ClientHeartbeat) {
 	// 2. Aggregate Data and Route to ReflexService -> Kafka
 	osActivity := int(heartbeat.KeystrokeCount) + int(heartbeat.ClickCount) + int(heartbeat.MouseDistance)
 
-	if osActivity > 0 || heartbeat.IsEyesClosed {
+	// 통계 기록 조건: OS 활동이 있거나, 눈이 감겼거나, 비전 점수가 있거나, 시간 추적 데이터가 있으면 기록
+	// (생각 모드, 멍 때리기, 일반 상태 등 모든 상황을 포함)
+	// 시간 추적 데이터(focus_time, sleep_time, away_time, distraction_time)가 있으면 반드시 기록해야 함
+	hasTimeTracking := heartbeat.FocusTime > 0 || heartbeat.SleepTime > 0 || heartbeat.AwayTime > 0 || heartbeat.DistractionTime > 0
+	if osActivity > 0 || heartbeat.IsEyesClosed || heartbeat.ConcentrationScore > 0 || hasTimeTracking {
 		activity := domain.NewClientActivity(heartbeat.ClientId, domain.ActivityInputUsage)
 		activity.AddMetadata("keystroke_count", fmt.Sprintf("%d", heartbeat.KeystrokeCount))
 		activity.AddMetadata("mouse_distance", fmt.Sprintf("%d", heartbeat.MouseDistance))
@@ -86,6 +90,24 @@ func (s *CoreServiceServer) processHeartbeat(heartbeat *proto.ClientHeartbeat) {
 		activity.AddMetadata("window_title", heartbeat.ActiveWindowTitle)
 		activity.AddMetadata("is_dragging", fmt.Sprintf("%v", heartbeat.IsDragging))
 		activity.AddMetadata("avg_dwell_time", fmt.Sprintf("%.2f", heartbeat.AvgDwellTime))
+		// 눈 감음 상태 및 비전 점수 메타데이터 추가 (통계 기록용)
+		activity.AddMetadata("is_eyes_closed", fmt.Sprintf("%v", heartbeat.IsEyesClosed))
+		activity.AddMetadata("concentration_score", fmt.Sprintf("%.2f", heartbeat.ConcentrationScore))
+		activity.AddMetadata("is_os_idle", fmt.Sprintf("%v", heartbeat.IsOsIdle))
+		
+		// 시간 추적 데이터 메타데이터 추가 (통계 기록용)
+		if heartbeat.FocusTime > 0 {
+			activity.AddMetadata("focus_time", fmt.Sprintf("%.2f", heartbeat.FocusTime))
+		}
+		if heartbeat.SleepTime > 0 {
+			activity.AddMetadata("sleep_time", fmt.Sprintf("%.2f", heartbeat.SleepTime))
+		}
+		if heartbeat.AwayTime > 0 {
+			activity.AddMetadata("away_time", fmt.Sprintf("%.2f", heartbeat.AwayTime))
+		}
+		if heartbeat.DistractionTime > 0 {
+			activity.AddMetadata("distraction_time", fmt.Sprintf("%.2f", heartbeat.DistractionTime))
+		}
 
 		// [Reflex Check] - Local Fast Path (e.g. Blacklist)
 		if _, err := s.reflexService.ProcessActivity(*activity); err != nil {
